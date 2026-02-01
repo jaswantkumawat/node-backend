@@ -200,38 +200,36 @@ export class AuthService {
   // ============================================================================
   // REGISTER
   // ============================================================================
-  static async register({ email, password, firstName, lastName, phone }) {
-    const user = await User.findOne({ email });
+static async register({ email, password, firstName, lastName, phone }) {
+  const existingUser = await User.findOne({ email });
 
-    if (user?.verified) {
-      throw new ApiError(409, "User already exists", {
-        email: "Email already registered",
-      });
-    }
-
-    let createdUser = user;
-
-    if (!user) {
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      createdUser = await User.create({
-        email,
-        password: hashedPassword,
-      });
-
-      if (firstName || lastName || phone) {
-        await Profile.create({
-          userId: createdUser._id,
-          profileType: "USER",
-          firstName,
-          lastName,
-          phone,
-        });
-      }
-    }
-
-    return createdUser;
+  // User already exists
+  if (existingUser) {
+    throw new ApiError(409, "User already registered", {
+      email: "Email already registered",
+    });
   }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const user = await User.create({
+    email,
+    password: hashedPassword,
+  });
+
+  if (firstName || lastName || phone) {
+    await Profile.create({
+      userId: user._id,
+      profileType: "USER",
+      firstName,
+      lastName,
+      phone,
+    });
+  }
+
+  return user;
+}
+
 
   // ================================
   // VERIFY USER
@@ -300,6 +298,7 @@ export class AuthService {
     return {
       accessToken,
       refreshToken,
+      refresh_expires_at:expiresAt
     };
   }
 
@@ -359,26 +358,22 @@ export class AuthService {
   // ================================
   // FORGOT PASSWORD
   // ================================
-  static async forgotPassword(email) {
-    const user = await User.findOne({ email });
+static async forgotPassword(email) {
+  const user = await User.findOne({ email });
 
-    if (!user) {
-      throw new ApiError(404, "User not found", {
-        email: "No account exists with this email",
-      });
-    }
-
-    if (!user.verified) {
-      throw new ApiError(400, "User not verified");
-    }
-
-    const { token } = await OTPService.createAndSendOtp(email);
-
-    return {
-      message: "OTP sent to email",
-      token,
-    };
+  if (!user) {
+    throw new ApiError(404, "User not found", {
+      email: "No account exists with this email",
+    });
   }
+
+  // No verification checks
+  // No OTP logic
+  // No external calls
+
+  return true;
+}
+
 
   // ================================
   // RESET PASSWORD

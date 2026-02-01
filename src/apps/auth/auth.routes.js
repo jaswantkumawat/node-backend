@@ -6,6 +6,7 @@ import {
   loginValidator,
   forgotPasswordValidator,
   resetPasswordValidator,
+  refreshSessionValidator,
 } from "./auth.validators.js";
 import { validate } from "./validate.middleware.js";
 
@@ -13,7 +14,7 @@ const router = Router();
 
 router.post("/register", registerValidator, validate, AuthController.register);
 
-router.post(
+router.patch(
   "/verify-user",
   verifyUserValidator,
   validate,
@@ -22,7 +23,7 @@ router.post(
 
 router.post("/login", loginValidator, validate, AuthController.login);
 
-router.post("/refresh", AuthController.refresh);
+router.post("/refresh-session",refreshSessionValidator, validate, AuthController.refresh);
 
 router.post(
   "/forgot-password",

@@ -17,6 +17,9 @@ export const registerValidator = [
 export const verifyUserValidator = [
   body("email").notEmpty().withMessage("Email is required"),
 ];
+export const refreshSessionValidator = [
+  body("refresh_token").notEmpty().withMessage("Refresh Token is required"),
+];
 
 export const loginValidator = [
   body("email")
