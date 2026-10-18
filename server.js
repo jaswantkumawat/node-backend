@@ -6,7 +6,7 @@ const PORT = process.env.PORT || 8000;
 
 (async () => {
   try {
-    await connectDB(); // 🔥 THIS WAS MISSING
+    await connectDB(); 
 
     const server = http.createServer(app);
 
